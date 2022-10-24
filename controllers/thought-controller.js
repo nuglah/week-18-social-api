@@ -14,7 +14,7 @@ const thoughtController = {
       });
   },
 
-  // Get single thought by id
+  // Get thought by id
   getSingleThought(req, res) {
     Thought.findOne({ _id: req.params.thoughtId })
       .then((dbThoughtData) => {
@@ -81,7 +81,6 @@ const thoughtController = {
           return res.status(404).json({ message: "No thought with this id!" });
         }
 
-        // Remove thought id from user's `thoughts` field
         return User.findOneAndUpdate(
           { thoughts: req.params.thoughtId },
           { $pull: { thoughts: req.params.thoughtId } },
@@ -121,7 +120,7 @@ const thoughtController = {
       });
   },
 
-  // Remove reaction from a thought
+  // Remove reaction
   removeReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },

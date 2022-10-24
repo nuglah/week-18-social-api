@@ -14,7 +14,7 @@ const userController = {
       });
   },
 
-  // Get single user by id
+  // Get user by id
   getSingleUser(req, res) {
     User.findOne({ _id: req.params.userId })
       .select("-__v")
@@ -68,7 +68,7 @@ const userController = {
       });
   },
 
-  // Delete user (BONUS: and delete associated thoughts)
+  // Delete user
   deleteUser(req, res) {
     User.findOneAndDelete({ _id: req.params.userId })
       .then((dbUserData) => {
@@ -76,7 +76,6 @@ const userController = {
           return res.status(404).json({ message: "No user with this id!" });
         }
 
-        // BONUS: Get ids of user's `thoughts` and delete them all
         return Thought.deleteMany({ _id: { $in: dbUserData.thoughts } });
       })
       .then(() => {
@@ -88,7 +87,7 @@ const userController = {
       });
   },
 
-  // Add friend to friend list
+  // Add friend
   addFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
@@ -107,7 +106,7 @@ const userController = {
       });
   },
 
-  // Remove friend from friend list
+  // Remove friend
   removeFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
