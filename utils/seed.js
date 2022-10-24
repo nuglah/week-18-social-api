@@ -1,41 +1,33 @@
-const connection = require("../config/connection");
-const { User, Thought } = require("../models");
-// const { getRandomName, getRandomAssignments } = require('./data');
+const mongoose = require("mongoose");
+const { Thought, User } = require("../models");
+const userSeeds = require("./userSeeds.json");
+const thoughtSeeds = require("./thoughtSeeds.json");
 
-connection.on("error", (err) => err);
+const seedDB = async () => {
+    await mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/social-media_db");
 
-connection.once("open", async () => {
-  console.log("connected");
+    await User.deleteMany({});       // clear the db first
+    await Thought.deleteMany({});
 
-  // Drop existing courses
-  await User.deleteMany({});
+    const users = await User.create(userSeeds);     // seed users
 
-  // Drop existing students
-  await Thought.deleteMany({});
+    for (thought of thoughtSeeds) {                  // loop thru all thoughts
 
-  await Reaction.deleteMany({});
+        const user = users[Math.floor(Math.random() * users.length)]      // create random user
 
-  // Create empty array to hold the students
-  const users = [];
+        const newThought = await Thought.create({           // create new thought and assign to the random user
+            ...thought,
+            userId: user.id,
+            userName: user.userName
+        });
 
-  users.push({
-    username: "ryan",
-    email: "email.com",
-    thoughts: friends,
-  });
+        await User.findOneAndUpdate({ _id: user.id }, {     // update random user
+            $addToSet: {
+                userThoughts: newThought._id     // new thought's id is pushed to user's userThoughts array
+            }
+        }, { new: true })
+    }
+    process.exit(0);
+};
 
-  // Add students to the collection and await the results
-  await Student.collection.insertMany(students);
-
-  // Add courses to the collection and await the results
-  await Course.collection.insertOne({
-    courseName: "UCLA",
-    inPerson: false,
-    students: [...students],
-  });
-
-  // Log out the seed data to indicate what should appear in the database
-  console.table(students);
-  console.info("Seeding complete! 🌱");
-  process.exit(0);
-});
+seedDB();
