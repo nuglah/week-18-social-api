@@ -16,6 +16,7 @@ const userController = {
 
   // Get user by id
   getSingleUser(req, res) {
+    console.log("HELLO", req.params.userId);
     User.findOne({ _id: req.params.userId })
       .select("-__v")
       .populate("friends")
